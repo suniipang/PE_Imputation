@@ -66,7 +66,7 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     predict_data = data[data['Well Name'] == well_name].copy()
     predict_data["PE_pred"] = Yimp_predicted
 
-    plot_with_PE_imputation(predict_data, facies_colors,R2)
+    plot_with_PE_imputation(predict_data, facies_colors,mse)
     ## 그림 저장하기
 
 
