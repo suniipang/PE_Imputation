@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plot_with_PE_imputation(logs, facies_colors,mse):
+def plot_with_PE_imputation(logs, facies_colors,score):
     # make sure logs are sorted by depth
     logs = logs.sort_values(by='Depth')
     cmap_facies = colors.ListedColormap(
@@ -59,10 +59,10 @@ def plot_with_PE_imputation(logs, facies_colors,mse):
     ax[4].set_yticklabels([])
     ax[5].set_yticklabels([])
     ax[5].set_xticklabels([])
-    f.suptitle('PE imputation test Well: %s (MSE:%.2f)' % (logs.iloc[0]['Well Name'], mse), fontsize=14, y=0.94)
+    f.suptitle('PE imputation test Well: %s (R2:%.2f)' % (logs.iloc[0]['Well Name'], score), fontsize=14, y=0.94)
 
     # 그림 보여줄 때
-    # plt.show()
+    plt.show()
 
     # 저장할 때
-    plt.savefig('MLP_PEimputation_testwell_%s.png' % (logs.iloc[0]['Well Name']) )
+    # plt.savefig('MLP_PEimputation_testwell_%s.png' % (logs.iloc[0]['Well Name']) )

@@ -41,9 +41,6 @@ scaler = RobustScaler()
 scaler.fit(Ximp)
 Ximp_scaled = scaler.transform(Ximp)
 
-from sklearn.metrics import mean_squared_error
-
-
 logo = LeaveOneGroupOut()
 
 H_grid = [20,30,40,50,60]
@@ -52,8 +49,8 @@ param_grid = []
 for H in H_grid:
     for I in I_grid:
         param_grid.append({'Hiddenlayersizes':H, 'MaxIter':I})
-
 from sklearn.metrics import mean_squared_error
+
 
 mse_param = []
 # score_param = []
@@ -96,7 +93,7 @@ mselist = []
 for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     well_name = wells_noPE[test[0]]
 
-    # Imputation using linear regression
+    # Imputation using MLP
     reg = MLPRegressor(hidden_layer_sizes=param_best['Hiddenlayersizes'], max_iter=param_best['MaxIter'])
     reg.fit(Ximp_scaled[train], Yimp[train])
 
