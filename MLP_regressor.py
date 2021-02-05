@@ -9,6 +9,7 @@ from sklearn.model_selection import LeaveOneGroupOut
 from plot_with_PE_imputation import plot_with_PE_imputation
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import time
 
 #Load Data
 data = pd.read_csv('./facies_vectors.csv')
@@ -43,21 +44,30 @@ Ximp_scaled = scaler.transform(Ximp)
 
 logo = LeaveOneGroupOut()
 
-H_grid = [20,30,40,50,60]
-I_grid = [2000,2500,3000,3500,4000]
+H_grid = [30,50,100,2000]
+I_grid = [1500,3000,7000]
 param_grid = []
 for H in H_grid:
     for I in I_grid:
         param_grid.append({'Hiddenlayersizes':H, 'MaxIter':I})
+
 from sklearn.metrics import mean_squared_error
 
-
 mse_param = []
-# score_param = []
+R2_param = []
+df_by_param = pd.DataFrame(columns=["R2","MSE"])
+
+start = time.time()
+
+param_grid_num = len(param_grid)
+i = 1
+
 for param in param_grid:
-    # score_split = []
+    R2_split = []
     mse_split = []
-    print(param)
+    print(i,"of", param_grid_num, param, end=" ")
+    traintimestart = time.time()
+
     for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
         well_name = wells_noPE[test[0]]
 
@@ -65,30 +75,40 @@ for param in param_grid:
         reg = MLPRegressor(hidden_layer_sizes=param['Hiddenlayersizes'], max_iter=param['MaxIter'])
         reg.fit(Ximp_scaled[train], Yimp[train])
 
-        # score = reg.score(Ximp_scaled[test],Yimp[test]) # R2
-        print("Well name_test : ", well_name)
-        # print("acc : %.3f" % score)
+        R2 = reg.score(Ximp_scaled[test],Yimp[test]) # R2
+        # print("Well name_test : ", well_name)
+        # print("R2 : %.4f" % R2)
         Yimp_predicted = reg.predict(Ximp_scaled[test])
         mse = mean_squared_error(Yimp[test],Yimp_predicted)
-        print("mse : %.3f" % mse)
+        # print("mse : %.4f" % mse)
 
-        # score_split.append(score)
+        R2_split.append(R2)
         mse_split.append(mse)
 
-    # score_param.append(np.mean(score_split))
+    R2_param.append(np.mean(R2_split))
     mse_param.append(np.mean(mse_split))
+    df_by_param.loc["H%i/I%i"%(param['Hiddenlayersizes'],param['MaxIter'])] = [np.mean(R2_split), np.mean(mse_split)]
+    i += 1
+    print("param train time : %.1f" %(time.time()-traintimestart))
+
+
+print(df_by_param)
 
 best_idx = np.argmin(mse_param)
 param_best = param_grid[best_idx]
 mse_best = mse_param[best_idx]
-print('\nBest mse = %.3f %s' % (mse_best, param_best))
+print('Best mse = %.4f %s' % (mse_best, param_best))
 
-# best_idx = np.argmax(score_param)
-# param_best = param_grid[best_idx]
-# score_best = score_param[best_idx]
-# print('\nBest score = %.3f %s' % (score_best, param_best))
+best_idx2 = np.argmax(R2_param)
+param_best2 = param_grid[best_idx2]
+R2_best = R2_param[best_idx2]
+print('Best R2 = %.4f %s' % (R2_best, param_best2))
+
+print("Gridsearch time : %.1f" %(time.time() - start))
 
 mselist = []
+R2list = []
+df_by_well = pd.DataFrame(columns=["R2","MSE"])
 
 for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     well_name = wells_noPE[test[0]]
@@ -97,20 +117,27 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     reg = MLPRegressor(hidden_layer_sizes=param_best['Hiddenlayersizes'], max_iter=param_best['MaxIter'])
     reg.fit(Ximp_scaled[train], Yimp[train])
 
-    # score = reg.score(Ximp_scaled[test], Yimp[test])  # R2
+    R2 = reg.score(Ximp_scaled[test], Yimp[test])  # R2
     # print("Well name_test : ", well_name)
-    # print("acc : %.3f" % score)
-    # acclist.append(score)
+    # print("R2 : %.4f" % R2)
+    R2list.append(R2)
 
     Yimp_predicted = reg.predict(Ximp_scaled[test])
     mse = mean_squared_error(Yimp[test], Yimp_predicted)
+    # print("mse : %.4f" % mse)
     mselist.append(mse)
 
     predict_data = data[data['Well Name'] == well_name].copy()
     predict_data["PE_pred"] = Yimp_predicted
 
-    plot_with_PE_imputation(predict_data, facies_colors,mse)
+    # plot_with_PE_imputation(predict_data, facies_colors,R2)
+    df_by_well.loc[well_name] = [R2, mse]
 
-average_mse = np.mean(mselist)
-# print(*acclist)
-print("Average MSE : ", average_mse)
+print(df_by_well)
+
+average_R2 = np.mean(np.array(R2list))
+average_mse = np.mean(np.array(mselist))
+print("average R2 : %.4f " % average_R2)
+print("average MSE : %.4f " % average_mse)
+
+print("total time: %.1f" %(time.time() - start))

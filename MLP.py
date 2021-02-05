@@ -1,14 +1,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import LeaveOneGroupOut
 
 from plot_with_PE_imputation import plot_with_PE_imputation
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import time
 
 #Load Data
 data = pd.read_csv('./facies_vectors.csv')
@@ -41,38 +39,34 @@ scaler = RobustScaler()
 scaler.fit(Ximp)
 Ximp_scaled = scaler.transform(Ximp)
 
-from sklearn.metrics import mean_squared_error
 logo = LeaveOneGroupOut()
-R2list = []
-mselist = []
 
-start = time.time()
+from sklearn.metrics import mean_squared_error
+
+mselist = []
+R2list = []
 
 for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     well_name = wells_noPE[test[0]]
 
-    # Imputation using linear regression
-    linear_model = LinearRegression()
-    linear_model.fit(Ximp_scaled[train], Yimp[train])
+    # Imputation using MLP
+    reg = MLPRegressor(hidden_layer_sizes=30, max_iter=5000)
+    reg.fit(Ximp_scaled[train], Yimp[train])
 
-    R2 = linear_model.score(Ximp_scaled[test],Yimp[test]) # R2
+    R2 = reg.score(Ximp_scaled[test], Yimp[test])  # R2
     print("Well name_test : ", well_name)
-    print("R2: %.4f" %R2)
+    print("R2 : %.4f" % R2)
     R2list.append(R2)
 
-    Yimp_predicted = linear_model.predict(Ximp_scaled[test])
-
-    mse = mean_squared_error(Yimp_predicted,Yimp[test]) ##MSE
-    print("mse: %.4f" %mse)
+    Yimp_predicted = reg.predict(Ximp_scaled[test])
+    mse = mean_squared_error(Yimp[test], Yimp_predicted)
+    print("mse : %.4f" % mse)
     mselist.append(mse)
 
     predict_data = data[data['Well Name'] == well_name].copy()
     predict_data["PE_pred"] = Yimp_predicted
 
-    plot_with_PE_imputation(predict_data, facies_colors,mse)
-    ## 그림 저장하기
-
-
+    # plot_with_PE_imputation(predict_data, facies_colors,R2)
 
 average_R2 = np.mean(np.array(R2list))
 average_mse = np.mean(np.array(mselist))

@@ -65,4 +65,4 @@ def plot_with_PE_imputation(logs, facies_colors,score):
     plt.show()
 
     # 저장할 때
-    # plt.savefig('MLP_PEimputation_testwell_%s.png' % (logs.iloc[0]['Well Name']) )
+    # plt.savefig('LSTM_PEimputation_testwell_%s.png' % (logs.iloc[0]['Well Name']) )
