@@ -44,12 +44,14 @@ Ximp_scaled = scaler.transform(Ximp)
 
 logo = LeaveOneGroupOut()
 
-H_grid = [10,20,30,40,50,60,70,80,90,100]
-I_grid = [1000] ## 1000번이면 수렴
+H1_grid = [10,20,30,40,50,60,70,80,90,100]
+H2_grid = [10,20,30,40,50,60,70,80,90,100]
+I_grid = [1500] ## 500번이면 수렴
 param_grid = []
-for H in H_grid:
-    for I in I_grid:
-        param_grid.append({'Hiddenlayersizes':H, 'MaxIter':I})
+for H1 in H1_grid:
+    for H2 in H2_grid:
+        for I in I_grid:
+            param_grid.append({'Hiddenlayersizes1':H1,'Hiddenlayersizes2':H2, 'MaxIter':I})
 
 from sklearn.metrics import mean_squared_error
 
@@ -61,7 +63,7 @@ start = time.time()
 
 param_grid_num = len(param_grid)
 i = 1
-random_state = 24
+random_state = 1004
 
 for param in param_grid:
     R2_split = []
@@ -72,8 +74,8 @@ for param in param_grid:
     for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
         well_name = wells_noPE[test[0]]
 
-        # Imputation using MLP
-        reg = MLPRegressor(hidden_layer_sizes=param['Hiddenlayersizes'], max_iter=param['MaxIter'],random_state=random_state)
+        # Imputation using linear regression
+        reg = MLPRegressor(hidden_layer_sizes=(param['Hiddenlayersizes1'], param['Hiddenlayersizes2']), max_iter=param['MaxIter'],random_state=random_state)
         reg.fit(Ximp_scaled[train], Yimp[train])
 
         R2 = reg.score(Ximp_scaled[test],Yimp[test]) # R2
@@ -88,7 +90,7 @@ for param in param_grid:
 
     R2_param.append(np.mean(R2_split))
     mse_param.append(np.mean(mse_split))
-    df_by_param.loc["H%i/I%i"%(param['Hiddenlayersizes'],param['MaxIter'])] = [np.mean(R2_split), np.mean(mse_split)]
+    df_by_param.loc["H%i/%i/I%i"%(param['Hiddenlayersizes1'],param['Hiddenlayersizes2'],param['MaxIter'])] = [np.mean(R2_split), np.mean(mse_split)]
     i += 1
     print("R2 : %.4f, mse : %.4f" %(np.mean(R2_split), np.mean(mse_split)), end=" ")
     print("param train time : %.1f" %(time.time()-traintimestart))
@@ -116,7 +118,7 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     well_name = wells_noPE[test[0]]
 
     # Imputation using MLP
-    reg = MLPRegressor(hidden_layer_sizes=param_best['Hiddenlayersizes'], max_iter=param_best['MaxIter'],random_state=random_state)
+    reg = MLPRegressor(hidden_layer_sizes=(param_best['Hiddenlayersizes1'], param_best['Hiddenlayersizes2']), max_iter=param_best['MaxIter'],random_state=random_state)
     reg.fit(Ximp_scaled[train], Yimp[train])
 
     R2 = reg.score(Ximp_scaled[test], Yimp[test])  # R2

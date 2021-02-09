@@ -9,6 +9,13 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import tensorflow as tf
 from tensorflow import keras
+import random as rn
+random_state = 1004
+tf.compat.v1.random.set_random_seed(random_state)
+np.random.seed(random_state)
+rn.seed(random_state)
+tf.random.set_seed(random_state)
+
 from matplotlib import pyplot
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
@@ -63,8 +70,8 @@ config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 # dropout_rate = 0.0
 # learning_rate = 0.001
 
-LON_grid = [10,20,30]
-BS_grid = [8,10,20]
+LON_grid = [20,25,30]
+BS_grid = [8,10,15]
 LR_grid = [0.001]
 
 param_grid = []
@@ -113,7 +120,7 @@ for param in param_grid:
         # print(model.summary())
 
         # Early stopping
-        early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=7, mode='min',verbose=0)
+        early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, mode='min',verbose=0)
 
         # Train model and plot training process
         history = model.fit(trainX, trainY, epochs=100, batch_size=param['BS'], validation_data=(testX, testY), verbose=0, shuffle=False, callbacks=[early_stopping])
@@ -139,9 +146,11 @@ for param in param_grid:
     mse_param.append(np.mean(mse_split))
     df_by_param.loc["LON%i/BS%i/LR%f"%(param['LON'],param['BS'],param['LR'])] = [np.mean(R2_split), np.mean(mse_split)]
     i += 1
+    print("R2 : %.4f, mse : %.4f" %(np.mean(R2_split), np.mean(mse_split)), end=" ")
     print("param train time : %.1f" %(time.time()-traintimestart))
 
 print(df_by_param)
+df_by_param.to_excel("LSTM_grid.xlsx")
 
 best_idx = np.argmin(mse_param)
 best_idx2 = np.argmax(R2_param)
@@ -149,8 +158,8 @@ param_best = param_grid[best_idx]
 param_best2 = param_grid[best_idx2]
 mse_best = mse_param[best_idx]
 R2_best = R2_param[best_idx2]
-print('\nBest mse = %.4f %s' % (mse_best, param_best))
-print('\nBest R2 = %.4f %s' % (R2_best, param_best2))
+print('Best mse = %.4f %s' % (mse_best, param_best))
+print('Best R2 = %.4f %s' % (R2_best, param_best2))
 
 print("Gridsearch time : %.1f" %(time.time() - start))
 
@@ -183,10 +192,10 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     # print(model.summary())
 
     # Early stopping
-    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=7, mode='min', verbose=1)
+    early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, mode='min', verbose=1)
 
     # Train model and plot training process
-    history = model.fit(trainX, trainY, epochs=150, batch_size=param_best['BS'], validation_data=(testX, testY), verbose=2,
+    history = model.fit(trainX, trainY, epochs=150, batch_size=param_best['BS'], validation_data=(testX, testY), verbose=0,
                         shuffle=False, callbacks=[early_stopping])
 
     # pyplot.plot(history.history['loss'], label='train')
@@ -212,6 +221,7 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     df_by_well.loc[well_name] = [R2, mse]
 
 print(df_by_well)
+df_by_well.to_excel("LSTM_eachwell.xlsx")
 
 average_R2 = np.mean(np.array(R2list))
 average_mse = np.mean(np.array(mselist))

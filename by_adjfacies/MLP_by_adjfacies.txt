@@ -1,0 +1,20 @@
+C:\Users\CSRD04\anaconda3\python.exe C:/Users/CSRD04/Desktop/Kwangsun_Intern/Imputation_linearregression/MLP_by_adjfacies.py
+Well name_test :  CHURCHMAN BIBLE / R2: 0.5351 mse: 0.5538
+Well name_test :  CROSS H CATTLE / R2: 0.6592 mse: 0.1558
+Well name_test :  LUKE G U / R2: 0.5672 mse: 0.2284
+Well name_test :  NEWBY / R2: 0.4568 mse: 0.1494
+Well name_test :  NOLAN / R2: 0.5537 mse: 0.3430
+Well name_test :  SHANKLE / R2: 0.4982 mse: 0.2686
+Well name_test :  SHRIMPLIN / R2: 0.2692 mse: 0.5944
+                       R2       MSE
+CHURCHMAN BIBLE  0.535053  0.553784
+CROSS H CATTLE   0.659167  0.155806
+LUKE G U         0.567174  0.228417
+NEWBY            0.456818  0.149392
+NOLAN            0.553684  0.342977
+SHANKLE          0.498179  0.268592
+SHRIMPLIN        0.269248  0.594364
+average R2 : 0.5056 
+average MSE : 0.3276 
+
+Process finished with exit code 0

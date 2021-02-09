@@ -1,0 +1,40 @@
+----------------- 'Well name_test :  CHURCHMAN BIBLE ' -----------------
+Epoch 00050: early stopping
+Well name_test :  CHURCHMAN BIBLE
+R2: 0.5643
+mse: 0.5189
+----------------- 'Well name_test :  CROSS H CATTLE ' -----------------
+Epoch 00064: early stopping
+Well name_test :  CROSS H CATTLE
+R2: 0.7063
+mse: 0.1342
+----------------- 'Well name_test :  LUKE G U ' -----------------
+Epoch 00142: early stopping
+Well name_test :  LUKE G U
+R2: 0.6266
+mse: 0.1971
+----------------- 'Well name_test :  NEWBY ' -----------------
+Epoch 00038: early stopping
+Well name_test :  NEWBY
+R2: 0.3487
+mse: 0.1791
+----------------- 'Well name_test :  NOLAN ' -----------------
+Epoch 00021: early stopping
+Well name_test :  NOLAN
+R2: 0.5599
+mse: 0.3382
+----------------- 'Well name_test :  SHANKLE ' -----------------
+Epoch 00038: early stopping
+Well name_test :  SHANKLE
+R2: 0.5524
+mse: 0.2396
+----------------- 'Well name_test :  SHRIMPLIN ' -----------------
+Epoch 00051: early stopping
+Well name_test :  SHRIMPLIN
+R2: 0.3842
+mse: 0.5009
+average R2 : 0.5346 
+average MSE : 0.3011 
+total time: 1039.2252848148346
+
+Process finished with exit code 0

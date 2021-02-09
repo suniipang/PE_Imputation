@@ -1,0 +1,50 @@
+1 of 9 {'LON': 20, 'BS': 8, 'LR': 0.001} R2 : 0.5379, mse : 0.3094 param train time : 1064.1
+2 of 9 {'LON': 20, 'BS': 10, 'LR': 0.001} R2 : 0.5206, mse : 0.3156 param train time : 813.4
+3 of 9 {'LON': 20, 'BS': 15, 'LR': 0.001} R2 : 0.5403, mse : 0.3078 param train time : 573.5
+4 of 9 {'LON': 25, 'BS': 8, 'LR': 0.001} R2 : 0.5449, mse : 0.2999 param train time : 998.1
+5 of 9 {'LON': 25, 'BS': 10, 'LR': 0.001} R2 : 0.5411, mse : 0.2987 param train time : 1048.7
+6 of 9 {'LON': 25, 'BS': 15, 'LR': 0.001} R2 : 0.5381, mse : 0.3073 param train time : 587.5
+7 of 9 {'LON': 30, 'BS': 8, 'LR': 0.001} R2 : 0.5316, mse : 0.2996 param train time : 812.0
+8 of 9 {'LON': 30, 'BS': 10, 'LR': 0.001} R2 : 0.5237, mse : 0.3095 param train time : 593.2
+9 of 9 {'LON': 30, 'BS': 15, 'LR': 0.001} R2 : 0.5334, mse : 0.3103 param train time : 471.7
+                             R2       MSE
+LON20/BS8/LR0.001000   0.537914  0.309405
+LON20/BS10/LR0.001000  0.520635  0.315628
+LON20/BS15/LR0.001000  0.540254  0.307810
+LON25/BS8/LR0.001000   0.544944  0.299850
+LON25/BS10/LR0.001000  0.541134  0.298682
+LON25/BS15/LR0.001000  0.538059  0.307330
+LON30/BS8/LR0.001000   0.531614  0.299559
+LON30/BS10/LR0.001000  0.523688  0.309543
+LON30/BS15/LR0.001000  0.533381  0.310304
+Best mse = 0.2987 {'LON': 25, 'BS': 10, 'LR': 0.001}
+Best R2 = 0.5449 {'LON': 25, 'BS': 8, 'LR': 0.001}
+Gridsearch time : 6962.2
+
+----------------- 'Well name_test :  CHURCHMAN BIBLE ' -----------------
+Epoch 00035: early stopping
+----------------- 'Well name_test :  CROSS H CATTLE ' -----------------
+Epoch 00112: early stopping
+----------------- 'Well name_test :  LUKE G U ' -----------------
+----------------- 'Well name_test :  NEWBY ' -----------------
+Epoch 00020: early stopping
+----------------- 'Well name_test :  NOLAN ' -----------------
+Epoch 00097: early stopping
+----------------- 'Well name_test :  SHANKLE ' -----------------
+Epoch 00051: early stopping
+----------------- 'Well name_test :  SHRIMPLIN ' -----------------
+Epoch 00051: early stopping
+
+                       R2       MSE
+CHURCHMAN BIBLE  0.545166  0.541739
+CROSS H CATTLE   0.734358  0.121434
+LUKE G U         0.635330  0.192449
+NEWBY            0.310208  0.189714
+NOLAN            0.581482  0.321615
+SHANKLE          0.578785  0.225449
+SHRIMPLIN        0.385806  0.499561
+average R2 : 0.5387 
+average MSE : 0.2989 
+total time: 7892.6
+
+Process finished with exit code 0

@@ -1,0 +1,50 @@
+1 of 16 {'LON': 5, 'BS': 5, 'LR': 0.001} R2 : 0.5055, mse : 0.3215 param train time : 952.4
+2 of 16 {'LON': 5, 'BS': 8, 'LR': 0.001} R2 : 0.5158, mse : 0.3193 param train time : 851.3
+3 of 16 {'LON': 5, 'BS': 10, 'LR': 0.001} R2 : 0.5260, mse : 0.3160 param train time : 841.8
+4 of 16 {'LON': 5, 'BS': 20, 'LR': 0.001} R2 : 0.5102, mse : 0.3269 param train time : 486.2
+5 of 16 {'LON': 10, 'BS': 5, 'LR': 0.001} R2 : 0.5231, mse : 0.3113 param train time : 967.6
+6 of 16 {'LON': 10, 'BS': 8, 'LR': 0.001} R2 : 0.5193, mse : 0.3214 param train time : 618.2
+7 of 16 {'LON': 10, 'BS': 10, 'LR': 0.001} R2 : 0.5260, mse : 0.3125 param train time : 713.8
+8 of 16 {'LON': 10, 'BS': 20, 'LR': 0.001} R2 : 0.5071, mse : 0.3383 param train time : 396.1
+9 of 16 {'LON': 15, 'BS': 5, 'LR': 0.001} R2 : 0.5095, mse : 0.3185 param train time : 927.7
+10 of 16 {'LON': 15, 'BS': 8, 'LR': 0.001} R2 : 0.5387, mse : 0.3085 param train time : 683.1
+11 of 16 {'LON': 15, 'BS': 10, 'LR': 0.001} R2 : 0.5250, mse : 0.3124 param train time : 668.1
+12 of 16 {'LON': 15, 'BS': 20, 'LR': 0.001} R2 : 0.5342, mse : 0.3127 param train time : 425.6
+13 of 16 {'LON': 20, 'BS': 5, 'LR': 0.001} R2 : 0.5216, mse : 0.3107 param train time : 1243.4
+14 of 16 {'LON': 20, 'BS': 8, 'LR': 0.001} R2 : 0.5305, mse : 0.3059 param train time : 815.6
+15 of 16 {'LON': 20, 'BS': 10, 'LR': 0.001} R2 : 0.5499, mse : 0.3017 param train time : 747.6
+16 of 16 {'LON': 20, 'BS': 20, 'LR': 0.001} R2 : 0.5425, mse : 0.3057 param train time : 437.6
+                             R2       MSE
+LON5/BS5/LR0.001000    0.505473  0.321462
+LON5/BS8/LR0.001000    0.515785  0.319261
+LON5/BS10/LR0.001000   0.526018  0.315967
+LON5/BS20/LR0.001000   0.510155  0.326932
+LON10/BS5/LR0.001000   0.523064  0.311267
+LON10/BS8/LR0.001000   0.519324  0.321435
+LON10/BS10/LR0.001000  0.526035  0.312477
+LON10/BS20/LR0.001000  0.507059  0.338342
+LON15/BS5/LR0.001000   0.509511  0.318509
+LON15/BS8/LR0.001000   0.538667  0.308546
+LON15/BS10/LR0.001000  0.525013  0.312360
+LON15/BS20/LR0.001000  0.534216  0.312743
+LON20/BS5/LR0.001000   0.521591  0.310673
+LON20/BS8/LR0.001000   0.530521  0.305914
+LON20/BS10/LR0.001000  0.549935  0.301705
+LON20/BS20/LR0.001000  0.542489  0.305664
+Best mse = 0.3017 {'LON': 20, 'BS': 10, 'LR': 0.001}
+Best R2 = 0.5499 {'LON': 20, 'BS': 10, 'LR': 0.001}
+Gridsearch time : 11776.0
+
+                       R2       MSE
+CHURCHMAN BIBLE  0.542879  0.544462
+CROSS H CATTLE   0.759487  0.109946
+LUKE G U         0.629913  0.195307
+NEWBY            0.391846  0.167261
+NOLAN            0.576658  0.325322
+SHANKLE          0.576614  0.226611
+SHRIMPLIN        0.279174  0.586291
+average R2 : 0.5367 
+average MSE : 0.3079 
+total time: 12631.6
+
+Process finished with exit code 0

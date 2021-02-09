@@ -43,32 +43,50 @@ logo = LeaveOneGroupOut()
 
 from sklearn.metrics import mean_squared_error
 
-mselist = []
-R2list = []
+## 같은 parameter로 여러번 반복
+loop = 10
+loop_mse_list = []
+loop_R2_list = []
+df_loop = pd.DataFrame(columns=["R2","MSE"])
 
-for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
-    well_name = wells_noPE[test[0]]
+for i in range(loop):
+    mselist = []
+    R2list = []
+    for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
+        well_name = wells_noPE[test[0]]
 
-    # Imputation using MLP
-    reg = MLPRegressor(hidden_layer_sizes=30, max_iter=5000)
-    reg.fit(Ximp_scaled[train], Yimp[train])
+        # Imputation using MLP
+        reg = MLPRegressor(hidden_layer_sizes=50, max_iter=1000)
+        reg.fit(Ximp_scaled[train], Yimp[train])
 
-    R2 = reg.score(Ximp_scaled[test], Yimp[test])  # R2
-    print("Well name_test : ", well_name)
-    print("R2 : %.4f" % R2)
-    R2list.append(R2)
+        R2 = reg.score(Ximp_scaled[test], Yimp[test])  # R2
+        print("Well name_test : ", well_name)
+        print("R2 : %.4f" % R2)
+        R2list.append(R2)
 
-    Yimp_predicted = reg.predict(Ximp_scaled[test])
-    mse = mean_squared_error(Yimp[test], Yimp_predicted)
-    print("mse : %.4f" % mse)
-    mselist.append(mse)
+        Yimp_predicted = reg.predict(Ximp_scaled[test])
+        mse = mean_squared_error(Yimp[test], Yimp_predicted)
+        print("mse : %.4f" % mse)
+        mselist.append(mse)
 
-    predict_data = data[data['Well Name'] == well_name].copy()
-    predict_data["PE_pred"] = Yimp_predicted
+        # predict_data = data[data['Well Name'] == well_name].copy()
+        # predict_data["PE_pred"] = Yimp_predicted
 
-    # plot_with_PE_imputation(predict_data, facies_colors,R2)
+        # plot_with_PE_imputation(predict_data, facies_colors,R2)
 
-average_R2 = np.mean(np.array(R2list))
-average_mse = np.mean(np.array(mselist))
-print("average R2 : %.4f " % average_R2)
-print("average MSE : %.4f " % average_mse)
+    average_R2 = np.mean(np.array(R2list))
+    average_mse = np.mean(np.array(mselist))
+    print("%i of %i" % (i+1,loop), end=" ")
+    print("average R2 : %.4f " % average_R2, end=" ")
+    print("average MSE : %.4f " % average_mse)
+
+    loop_mse_list.append(average_mse)
+    loop_R2_list.append(average_R2)
+    df_loop.loc["try %i"%(i+1)] = [average_R2, average_mse]
+
+average_R2_loop = np.mean(np.array(loop_R2_list))
+average_mse_loop = np.mean(np.array(loop_mse_list))
+df_loop.loc["average"] = [average_R2_loop, average_mse_loop]
+
+print(df_loop)
+df_loop.to_excel("MLP_try10.xlsx")

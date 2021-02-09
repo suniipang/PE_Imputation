@@ -1,0 +1,9 @@
+Well name_test :  CHURCHMAN BIBLE / R2: 0.4935 mse: 0.6032
+Well name_test :  CROSS H CATTLE / R2: 0.7622 mse: 0.1087
+Well name_test :  LUKE G U / R2: 0.5432 mse: 0.2411
+Well name_test :  NEWBY / R2: 0.2990 mse: 0.1928
+Well name_test :  NOLAN / R2: 0.5458 mse: 0.3490
+Well name_test :  SHANKLE / R2: 0.5752 mse: 0.2274
+Well name_test :  SHRIMPLIN / R2: 0.2266 mse: 0.6291
+average R2 : 0.4922 
+average MSE : 0.3359 

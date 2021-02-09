@@ -33,8 +33,21 @@ DataImp_dropF9 = DataImp_dropNA.drop(F9idx)
 wells_noPE = DataImp_dropF9['Well Name'].values
 DataImp = DataImp_dropF9.drop(['Formation', 'Well Name', 'Depth'], axis=1).copy()
 
+Ximplist = []
+Yimplist = []
+
 Ximp=DataImp.loc[:, DataImp.columns != 'PE'].values
 Yimp=DataImp.loc[:, 'PE'].values
+
+## adjacent facies 분류 (123, 456789)
+# Ximp1 = DataImp.loc[DataImp["Facies"] <= 3, DataImp.columns != 'PE'].values
+# Yimp1 = DataImp.loc[DataImp["Facies"] <= 3, "PE"].values
+# Ximplist.append(Ximp1)
+# Yimplist.append(Yimp1)
+# Ximp2 = DataImp.loc[DataImp["Facies"] >= 4, DataImp.columns != 'PE'].values
+# Yimp2 = DataImp.loc[DataImp["Facies"] >= 4, "PE"].values
+# Ximplist.append(Ximp2)
+# Yimplist.append(Yimp2)
 
 from sklearn.preprocessing import RobustScaler
 scaler = RobustScaler()
@@ -42,6 +55,13 @@ scaler.fit(Ximp)
 Ximp_scaled = scaler.transform(Ximp)
 
 from sklearn.metrics import mean_squared_error
+R2list = []
+mselist = []
+
+
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
+
 logo = LeaveOneGroupOut()
 R2list = []
 mselist = []
@@ -51,25 +71,40 @@ start = time.time()
 for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     well_name = wells_noPE[test[0]]
 
-    # Imputation using linear regression
-    linear_model = LinearRegression()
-    linear_model.fit(Ximp_scaled[train], Yimp[train])
+    Xtrain = Ximp_scaled[train]
+    Ytrain = Yimp[train]
+    trainSSidx = Xtrain[:, 0] <= 0 ##scaling 후 facies 3이 0으로 됨
+    trainLSidx = Xtrain[:, 0] > 0
 
-    R2 = linear_model.score(Ximp_scaled[test],Yimp[test]) # R2
-    print("Well name_test : ", well_name)
-    print("R2: %.4f" %R2)
-    R2list.append(R2)
+    Xtest = Ximp_scaled[test]
+    Ytest = Yimp[test]
+    testSSidx = Xtest[:,0] <= 0
+    testLSidx = Xtest[:,0] > 0
 
-    Yimp_predicted = linear_model.predict(Ximp_scaled[test])
+    ## generate two linear regression model
+    linear_model1 = LinearRegression()
+    linear_model1.fit(Xtrain[trainSSidx],Ytrain[trainSSidx])
+    linear_model2 = LinearRegression()
+    linear_model2.fit(Xtrain[trainLSidx],Ytrain[trainLSidx])
 
-    mse = mean_squared_error(Yimp[test],Yimp_predicted) ##MSE
+    ## prediction
+    Ypred = np.empty(Ytest.shape,float)
+    Ypred[testSSidx] = linear_model1.predict(Xtest[testSSidx])
+    Ypred[testLSidx] = linear_model2.predict(Xtest[testLSidx])
+
+    R2 = r2_score(Ytest,Ypred)
+    mse = mean_squared_error(Ytest,Ypred)
+
+    print("Well name_test : ", well_name, end=" / ")
+    print("R2: %.4f" %R2, end = " ")
     print("mse: %.4f" %mse)
+    R2list.append(R2)
     mselist.append(mse)
 
     predict_data = data[data['Well Name'] == well_name].copy()
-    predict_data["PE_pred"] = Yimp_predicted
+    predict_data["PE_pred"] = Ypred
 
-    plot_with_PE_imputation(predict_data, facies_colors,R2)
+    # plot_with_PE_imputation(predict_data, facies_colors,R2)
     ## 그림 저장하기
 
 
