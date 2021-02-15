@@ -16,11 +16,11 @@ def make_facies_log_plot(logs, facies_colors):
     cluster = np.repeat(np.expand_dims(logs['Facies'].values, 1), 100, 1)
 
     f, ax = plt.subplots(nrows=1, ncols=6, figsize=(8, 12))
-    ax[0].plot(logs.GR, logs.Depth, '.g')
-    ax[1].plot(logs.ILD_log10, logs.Depth, '.')
-    ax[2].plot(logs.DeltaPHI, logs.Depth, '.', color='0.5')
-    ax[3].plot(logs.PHIND, logs.Depth, '.', color='r')
-    ax[4].plot(logs.PE, logs.Depth, '.', color='black')
+    ax[0].plot(logs.GR, logs.Depth, '-g')
+    ax[1].plot(logs.ILD_log10, logs.Depth, '-')
+    ax[2].plot(logs.DeltaPHI, logs.Depth, '-', color='0.5')
+    ax[3].plot(logs.PHIND, logs.Depth, '-', color='r')
+    ax[4].plot(logs.PE, logs.Depth, '-', color='black')
 
     im = ax[5].imshow(cluster, interpolation='none', aspect='auto',
                       cmap=cmap_facies, vmin=1, vmax=9)
@@ -52,10 +52,13 @@ def make_facies_log_plot(logs, facies_colors):
     ax[4].set_xlim(logs.PE.min(), logs.PE.max())
     ax[5].set_xlabel('Facies')
 
-    ax[1].set_yticklabels([]);
-    ax[2].set_yticklabels([]);
+    ax[1].set_yticklabels([])
+    ax[2].set_yticklabels([])
     ax[3].set_yticklabels([])
-    ax[4].set_yticklabels([]);
+    ax[4].set_yticklabels([])
     ax[5].set_yticklabels([])
     ax[5].set_xticklabels([])
     f.suptitle('Well: %s' % logs.iloc[0]['Well Name'], fontsize=14, y=0.94)
+
+    # plt.show()
+    plt.savefig('Wellname_%s.png' % (logs.iloc[0]['Well Name']) )

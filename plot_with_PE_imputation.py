@@ -16,12 +16,12 @@ def plot_with_PE_imputation(logs, facies_colors,score):
     cluster = np.repeat(np.expand_dims(logs['Facies'].values, 1), 100, 1)
 
     f, ax = plt.subplots(nrows=1, ncols=6, figsize=(8, 12))
-    ax[0].plot(logs.GR, logs.Depth, '.g')
-    ax[1].plot(logs.ILD_log10, logs.Depth, '.')
-    ax[2].plot(logs.DeltaPHI, logs.Depth, '.', color='0.5')
-    ax[3].plot(logs.PHIND, logs.Depth, '.', color='r')
-    ax[4].plot(logs.PE, logs.Depth, '.', color='black')
-    ax[4].plot(logs.PE_pred, logs.Depth, '.', color='cyan') ## 내가 추가한 부분
+    ax[0].plot(logs.GR, logs.Depth, '-g')
+    ax[1].plot(logs.ILD_log10, logs.Depth, '-')
+    ax[2].plot(logs.DeltaPHI, logs.Depth, '-', color='0.5')
+    ax[3].plot(logs.PHIND, logs.Depth, '-', color='r')
+    ax[4].plot(logs.PE, logs.Depth, '-', color='black')
+    ax[4].plot(logs.PE_pred, logs.Depth, '-', color='cyan') ## 내가 추가한 부분
 
     im = ax[5].imshow(cluster, interpolation='none', aspect='auto',
                       cmap=cmap_facies, vmin=1, vmax=9)
@@ -62,7 +62,7 @@ def plot_with_PE_imputation(logs, facies_colors,score):
     f.suptitle('PE imputation test Well: %s (R2:%.2f)' % (logs.iloc[0]['Well Name'], score), fontsize=14, y=0.94)
 
     # 그림 보여줄 때
-    # plt.show()
+    plt.show()
 
     # 저장할 때
-    plt.savefig('LSTM_PEimputation_testwell_%s.png' % (logs.iloc[0]['Well Name']) )
+    # plt.savefig('LSTM_PEimputation_testwell_%s.png' % (logs.iloc[0]['Well Name']) )

@@ -69,10 +69,10 @@ for i in range(loop):
         print("mse : %.4f" % mse)
         mselist.append(mse)
 
-        # predict_data = data[data['Well Name'] == well_name].copy()
-        # predict_data["PE_pred"] = Yimp_predicted
+        predict_data = data[data['Well Name'] == well_name].copy()
+        predict_data["PE_pred"] = Yimp_predicted
 
-        # plot_with_PE_imputation(predict_data, facies_colors,R2)
+        plot_with_PE_imputation(predict_data, facies_colors,R2)
 
     average_R2 = np.mean(np.array(R2list))
     average_mse = np.mean(np.array(mselist))
