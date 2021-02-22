@@ -18,6 +18,7 @@ tf.random.set_seed(random_state)
 from matplotlib import pyplot
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
+from scipy.signal import medfilt
 
 import time
 
@@ -67,7 +68,7 @@ config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 # parameter
 lstm_output_num = 20
-batchsize = 30
+batchsize = 10
 dropout_rate = 0.0
 learning_rate = 0.001
 
@@ -104,7 +105,7 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, mode='min', verbose=1)
 
     # Train model and plot training process
-    history = model.fit(trainX, trainY, epochs=150, batch_size=batchsize, validation_data=(testX, testY), verbose=2,
+    history = model.fit(trainX, trainY, epochs=150, batch_size=batchsize, validation_data=(testX, testY), verbose=0,
                         shuffle=False, callbacks=[early_stopping])
 
     # pyplot.plot(history.history['loss'], label='train')
@@ -114,6 +115,9 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
 
     # prediction (R2, mse)
     Yimp_predicted = np.ravel(model.predict(testX))
+    ## medfilt
+    Yimp_predicted = medfilt(Yimp_predicted, kernel_size=5)
+
     R2 = r2_score(testY, Yimp_predicted)
     print("Well name_test : ", well_name)
     print("R2: %.4f" %R2)

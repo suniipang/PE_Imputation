@@ -9,6 +9,8 @@ from plot_with_PE_imputation import plot_with_PE_imputation
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import time
+from scipy.signal import medfilt
+
 
 #Load Data
 data = pd.read_csv('./facies_vectors.csv')
@@ -91,6 +93,9 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     Ypred = np.empty(Ytest.shape,float)
     Ypred[testSSidx] = linear_model1.predict(Xtest[testSSidx])
     Ypred[testLSidx] = linear_model2.predict(Xtest[testLSidx])
+
+    ## medfilt
+    Ypred = medfilt(Ypred,kernel_size=5)
 
     R2 = r2_score(Ytest,Ypred)
     mse = mean_squared_error(Ytest,Ypred)

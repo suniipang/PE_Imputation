@@ -7,6 +7,7 @@ from sklearn.model_selection import LeaveOneGroupOut
 from plot_with_PE_imputation import plot_with_PE_imputation
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy.signal import medfilt
 
 #Load Data
 data = pd.read_csv('./facies_vectors.csv')
@@ -41,6 +42,7 @@ Ximp_scaled = scaler.transform(Ximp)
 
 logo = LeaveOneGroupOut()
 
+from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
 ## 같은 parameter로 여러번 반복
@@ -59,20 +61,23 @@ for i in range(loop):
         reg = MLPRegressor(hidden_layer_sizes=50, max_iter=1000)
         reg.fit(Ximp_scaled[train], Yimp[train])
 
-        R2 = reg.score(Ximp_scaled[test], Yimp[test])  # R2
+        Yimp_predicted = reg.predict(Ximp_scaled[test])
+        ## medfilt
+        Yimp_predicted = medfilt(Yimp_predicted, kernel_size=5)
+
+        R2 = r2_score(Yimp[test], Yimp_predicted)
+        mse = mean_squared_error(Yimp[test], Yimp_predicted)
         print("Well name_test : ", well_name)
         print("R2 : %.4f" % R2)
-        R2list.append(R2)
-
-        Yimp_predicted = reg.predict(Ximp_scaled[test])
-        mse = mean_squared_error(Yimp[test], Yimp_predicted)
         print("mse : %.4f" % mse)
+        R2list.append(R2)
         mselist.append(mse)
 
-        predict_data = data[data['Well Name'] == well_name].copy()
-        predict_data["PE_pred"] = Yimp_predicted
+        if i == loop-1:
+            predict_data = data[data['Well Name'] == well_name].copy()
+            predict_data["PE_pred"] = Yimp_predicted
 
-        plot_with_PE_imputation(predict_data, facies_colors,R2)
+            # plot_with_PE_imputation(predict_data, facies_colors,R2)
 
     average_R2 = np.mean(np.array(R2list))
     average_mse = np.mean(np.array(mselist))

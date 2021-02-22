@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import LeaveOneGroupOut
 
 from plot_with_PE_imputation import plot_with_PE_imputation
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy.signal import medfilt
 import time
 
 #Load Data
@@ -41,6 +41,7 @@ scaler = RobustScaler()
 scaler.fit(Ximp)
 Ximp_scaled = scaler.transform(Ximp)
 
+from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 logo = LeaveOneGroupOut()
 R2list = []
@@ -55,21 +56,22 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     linear_model = LinearRegression()
     linear_model.fit(Ximp_scaled[train], Yimp[train])
 
-    R2 = linear_model.score(Ximp_scaled[test],Yimp[test]) # R2
+    Yimp_predicted = linear_model.predict(Ximp_scaled[test])
+    ## medfilt
+    Yimp_predicted = medfilt(Yimp_predicted,kernel_size=5)
+
+    R2 = r2_score(Yimp[test],Yimp_predicted) ##R2
+    mse = mean_squared_error(Yimp[test],Yimp_predicted) ##MSE
     print("Well name_test : ", well_name)
     print("R2: %.4f" %R2)
-    R2list.append(R2)
-
-    Yimp_predicted = linear_model.predict(Ximp_scaled[test])
-
-    mse = mean_squared_error(Yimp[test],Yimp_predicted) ##MSE
     print("mse: %.4f" %mse)
+    R2list.append(R2)
     mselist.append(mse)
 
     predict_data = data[data['Well Name'] == well_name].copy()
     predict_data["PE_pred"] = Yimp_predicted
 
-    plot_with_PE_imputation(predict_data, facies_colors,R2)
+    # plot_with_PE_imputation(predict_data, facies_colors,R2)
     ## 그림 저장하기
 
 

@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import LeaveOneGroupOut
 
 from plot_with_PE_imputation import plot_with_PE_imputation
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy.signal import medfilt
 import time
 
 #Load Data
@@ -57,8 +57,8 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     facies_scaled = np.unique(Ximp_scaled[:,0])
     mean_PE = []
     Ytrain = np.zeros(Yimp[train].shape)
-    for i in range(9):
-        fidx = (Ximp_scaled[train][:,0] == facies_scaled[i])
+    for f in range(9):
+        fidx = (Ximp_scaled[train][:,0] == facies_scaled[f])
         mean_f = Yimp[train][fidx].mean()
         mean_PE.append(mean_f)
         Ytrain[fidx] = Yimp[train][fidx] - mean_f
@@ -68,15 +68,19 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
 
     Y_residual_pred = linear_model.predict(Ximp_scaled[test][:,1:])
     Yimp_predicted = np.zeros(Yimp[test].shape)
-    for i in range(9):
-        fidx = (Ximp_scaled[test][:,0] == facies_scaled[i])
-        Yimp_predicted[fidx] = Y_residual_pred[fidx] + mean_PE[i]
+    for f in range(9):
+        fidx = (Ximp_scaled[test][:,0] == facies_scaled[f])
+        Yimp_predicted[fidx] = Y_residual_pred[fidx] + mean_PE[f]
 
         ## facies별로 정확도 한번 확인해보자
-        R2_f = r2_score(Yimp[test][fidx], Yimp_predicted[fidx])
-        print("facies %i R2 : %.4f" %(i+1, R2_f))
+        if np.any(fidx) == True:
+            R2_f = r2_score(Yimp[test][fidx], Yimp_predicted[fidx])
+            print("facies %i R2 : %.4f" % (f + 1, R2_f))
 
-    R2 = r2_score(Yimp[test],Yimp_predicted)
+    ## medfilt
+    Yimp_predicted = medfilt(Yimp_predicted,kernel_size=5)
+
+    R2 = r2_score(Yimp[test],Yimp_predicted) ##R2
     R2list.append(R2)
 
     mse = mean_squared_error(Yimp[test],Yimp_predicted) ##MSE
@@ -89,7 +93,7 @@ for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
     predict_data = data[data['Well Name'] == well_name].copy()
     predict_data["PE_pred"] = Yimp_predicted
 
-    plot_with_PE_imputation(predict_data, facies_colors,R2)
+    # plot_with_PE_imputation(predict_data, facies_colors,R2)
 
 
 

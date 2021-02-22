@@ -9,6 +9,7 @@ import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.signal import medfilt
 
+
 #Load Data
 data = pd.read_csv('./facies_vectors.csv')
 
@@ -23,23 +24,17 @@ facies_colors = ['#F4D03F', '#F5B041','#DC7633','#6E2C00', '#1B4F72','#2E86C1', 
 
 # Store well labels and depths
 wells = data['Well Name'].values
-# depth = data['Depth'].values
+depth = data['Depth'].values
 
 # Imputation
 DataImp_dropNA = data.dropna(axis = 0, inplace = False)
 F9idx = DataImp_dropNA[DataImp_dropNA['Well Name'] == 'Recruit F9'].index
 DataImp_dropF9 = DataImp_dropNA.drop(F9idx)
-
 wells_noPE = DataImp_dropF9['Well Name'].values
-depth = DataImp_dropF9['Depth'].values
-
 DataImp = DataImp_dropF9.drop(['Formation', 'Well Name', 'Depth'], axis=1).copy()
 
 Ximp=DataImp.loc[:, DataImp.columns != 'PE'].values
 Yimp=DataImp.loc[:, 'PE'].values
-
-from augment_features import augment_features
-X_aug, padded_rows = augment_features(Ximp, wells_noPE,depth)
 
 from sklearn.preprocessing import RobustScaler
 scaler = RobustScaler()
@@ -48,8 +43,8 @@ Ximp_scaled = scaler.transform(Ximp)
 
 logo = LeaveOneGroupOut()
 
-from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
 
 ## 같은 parameter로 여러번 반복
 loop = 10
@@ -62,32 +57,48 @@ for i in range(loop):
     R2list = []
     for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
         well_name = wells_noPE[test[0]]
+        print("Well name_test : ", well_name)
 
-        # delete padding
-        train = np.setdiff1d(train, padded_rows)
-        test = np.setdiff1d(test, padded_rows)
+        # predict residual by each facies
+        facies_scaled = np.unique(Ximp_scaled[:, 0])
+        mean_PE = []
+        Ytrain = np.zeros(Yimp[train].shape)
+        for f in range(9):
+            fidx = (Ximp_scaled[train][:, 0] == facies_scaled[f])
+            mean_f = Yimp[train][fidx].mean()
+            mean_PE.append(mean_f)
+            Ytrain[fidx] = Yimp[train][fidx] - mean_f
 
         # Imputation using MLP
-        reg = MLPRegressor(hidden_layer_sizes=50, max_iter=1000)
-        reg.fit(Ximp_scaled[train], Yimp[train])
+        reg = MLPRegressor(hidden_layer_sizes=70, max_iter=1000)
+        reg.fit(Ximp_scaled[train][:,1:], Ytrain)
 
-        Yimp_predicted = reg.predict(Ximp_scaled[test])
+        Y_residual_pred = reg.predict(Ximp_scaled[test][:, 1:])
+        Yimp_predicted = np.zeros(Yimp[test].shape)
+        for f in range(9):
+            fidx = (Ximp_scaled[test][:, 0] == facies_scaled[f])
+            Yimp_predicted[fidx] = Y_residual_pred[fidx] + mean_PE[f]
+
+            # ## facies별로 정확도 한번 확인해보자
+            # if np.any(fidx) == True:
+            #     R2_f = r2_score(Yimp[test][fidx], Yimp_predicted[fidx])
+            #     print("facies %i R2 : %.4f" % (f+1, R2_f))
+
         ## medfilt
         Yimp_predicted = medfilt(Yimp_predicted, kernel_size=5)
 
-        R2 = r2_score(Yimp[test], Yimp_predicted)  # R2
-        print("Well name_test : ", well_name)
-        print("R2 : %.4f" % R2)
+        R2 = r2_score(Yimp[test], Yimp_predicted)  ##R2
         R2list.append(R2)
 
-
-        mse = mean_squared_error(Yimp[test], Yimp_predicted)
-        print("mse : %.4f" % mse)
+        mse = mean_squared_error(Yimp[test], Yimp_predicted)  ##MSE
         mselist.append(mse)
 
-        predict_data = data[data['Well Name'] == well_name].copy()
-        predict_data = predict_data.drop([predict_data.index[0], predict_data.index[-1]])
-        predict_data["PE_pred"] = Yimp_predicted
+        # print("Well name_test : ", well_name)
+        print("R2: %.4f" % R2)
+        print("mse: %.4f" % mse)
+
+        # predict_data = data[data['Well Name'] == well_name].copy()
+        # predict_data["PE_pred"] = Yimp_predicted
 
         # plot_with_PE_imputation(predict_data, facies_colors,R2)
 

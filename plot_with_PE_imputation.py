@@ -62,7 +62,7 @@ def plot_with_PE_imputation(logs, facies_colors,score):
     f.suptitle('PE imputation test Well: %s (R2:%.2f)' % (logs.iloc[0]['Well Name'], score), fontsize=14, y=0.94)
 
     # 그림 보여줄 때
-    plt.show()
+    # plt.show()
 
     # 저장할 때
-    # plt.savefig('LSTM_PEimputation_testwell_%s.png' % (logs.iloc[0]['Well Name']) )
+    plt.savefig('MLP_PEimputation_testwell_%s.png' % (logs.iloc[0]['Well Name']) )

@@ -23,23 +23,17 @@ facies_colors = ['#F4D03F', '#F5B041','#DC7633','#6E2C00', '#1B4F72','#2E86C1', 
 
 # Store well labels and depths
 wells = data['Well Name'].values
-# depth = data['Depth'].values
+depth = data['Depth'].values
 
 # Imputation
 DataImp_dropNA = data.dropna(axis = 0, inplace = False)
 F9idx = DataImp_dropNA[DataImp_dropNA['Well Name'] == 'Recruit F9'].index
 DataImp_dropF9 = DataImp_dropNA.drop(F9idx)
-
 wells_noPE = DataImp_dropF9['Well Name'].values
-depth = DataImp_dropF9['Depth'].values
-
 DataImp = DataImp_dropF9.drop(['Formation', 'Well Name', 'Depth'], axis=1).copy()
 
 Ximp=DataImp.loc[:, DataImp.columns != 'PE'].values
 Yimp=DataImp.loc[:, 'PE'].values
-
-from augment_features import augment_features
-X_aug, padded_rows = augment_features(Ximp, wells_noPE,depth)
 
 from sklearn.preprocessing import RobustScaler
 scaler = RobustScaler()
@@ -63,10 +57,6 @@ for i in range(loop):
     for train, test in logo.split(Ximp_scaled, Yimp, groups=wells_noPE):
         well_name = wells_noPE[test[0]]
 
-        # delete padding
-        train = np.setdiff1d(train, padded_rows)
-        test = np.setdiff1d(test, padded_rows)
-
         # Imputation using MLP
         reg = MLPRegressor(hidden_layer_sizes=50, max_iter=1000)
         reg.fit(Ximp_scaled[train], Yimp[train])
@@ -75,20 +65,17 @@ for i in range(loop):
         ## medfilt
         Yimp_predicted = medfilt(Yimp_predicted, kernel_size=5)
 
-        R2 = r2_score(Yimp[test], Yimp_predicted)  # R2
+        R2 = r2_score(Yimp[test], Yimp_predicted)
+        mse = mean_squared_error(Yimp[test], Yimp_predicted)
         print("Well name_test : ", well_name)
         print("R2 : %.4f" % R2)
-        R2list.append(R2)
-
-
-        mse = mean_squared_error(Yimp[test], Yimp_predicted)
         print("mse : %.4f" % mse)
+        R2list.append(R2)
         mselist.append(mse)
 
-        predict_data = data[data['Well Name'] == well_name].copy()
-        predict_data = predict_data.drop([predict_data.index[0], predict_data.index[-1]])
-        predict_data["PE_pred"] = Yimp_predicted
-
+        # predict_data = data[data['Well Name'] == well_name].copy()
+        # predict_data["PE_pred"] = Yimp_predicted
+        #
         # plot_with_PE_imputation(predict_data, facies_colors,R2)
 
     average_R2 = np.mean(np.array(R2list))
