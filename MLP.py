@@ -73,11 +73,11 @@ for i in range(loop):
         R2list.append(R2)
         mselist.append(mse)
 
-        if i == loop-1:
-            predict_data = data[data['Well Name'] == well_name].copy()
-            predict_data["PE_pred"] = Yimp_predicted
-
-            # plot_with_PE_imputation(predict_data, facies_colors,R2)
+        # if i == loop-1:
+        #     predict_data = data[data['Well Name'] == well_name].copy()
+        #     predict_data["PE_pred"] = Yimp_predicted
+        #
+        #     plot_with_PE_imputation(predict_data, facies_colors,R2)
 
     average_R2 = np.mean(np.array(R2list))
     average_mse = np.mean(np.array(mselist))
@@ -94,4 +94,4 @@ average_mse_loop = np.mean(np.array(loop_mse_list))
 df_loop.loc["average"] = [average_R2_loop, average_mse_loop]
 
 print(df_loop)
-df_loop.to_excel("MLP_try10.xlsx")
+# df_loop.to_excel("MLP_try10.xlsx")
